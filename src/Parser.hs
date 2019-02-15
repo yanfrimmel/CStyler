@@ -3,20 +3,30 @@ module Parser (parse) where
 import System.IO  
 import System.Directory
 import Data.Char
-import Data.List
 
+parseToC :: String -> String
+parseToC str =  unlines $ map (parseLineToC) strLines
+    where strLines = lines str   
 
-parseToC :: String :: String
 parseLineToC :: String -> String
 parseLineToC str 
-    | isStringCanBeChangedToC str  = concatMap (\y -> 
-        if isUpper y 
-        then '_' : toLower y : [] 
-        else [y]) str
-    | otherwise = str     
+    | isLineCanBeChangedToC str  = 
+        if second == '#' then str
+        else if isAlpha curHead && isLower curHead && isAlpha second && isUpper second then
+            curHead : '_' : toLower second : (parseLineToC $ tail $ tail $ str)
+        else curHead : (parseLineToC $ tail str) 
+    | otherwise = str    
+    where curHead = head str
+          second = 
+            if length str > 1 then 
+                head $ tail $ str
+            else '#' -- just mark with dummy char to know that this is an empty list
 
-isStringCanBeChangedToC :: String -> Bool                                
-isStringCanBeChangedToC str = (head str) == '#'
+isLineCanBeChangedToC :: String -> Bool                                
+isLineCanBeChangedToC str = 
+    if str == [] then 
+        False 
+    else (head str) /= '#'
 
 parse :: String -> String -> IO() 
 parse style filePath = do
@@ -26,7 +36,7 @@ parse style filePath = do
             handle <- openFile filePath ReadMode  
             (tempName, tempHandle) <- openTempFile "." "temp"  
             contents <- hGetContents handle  
-            hPutStr tempHandle $ parseLineToC contents  
+            hPutStr tempHandle $ parseToC contents  
             hClose handle  
             hClose tempHandle  
             removeFile filePath  
