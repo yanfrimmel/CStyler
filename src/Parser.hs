@@ -4,37 +4,50 @@ import System.IO
 import System.Directory
 import Data.Char
 
+includeSymbol :: Char
+includeSymbol = '#'
+
+underScoreSymbol :: Char
+underScoreSymbol = '_'
+
+parseToCStyle :: String
+parseToCStyle = "toc"
+
 parseToC :: String -> String
 parseToC str =  unlines $ map (parseLineToC) strLines
     where strLines = lines str   
 
+isTwoLettersCamelCase :: Char -> Char -> Bool
+isTwoLettersCamelCase firstLetter secondLetter = 
+    isLower firstLetter && isUpper secondLetter
+
 parseLineToC :: String -> String
 parseLineToC str 
     | isLineCanBeChangedToC str  = 
-        if second == '#' then str
-        else if isAlpha curHead && isLower curHead && isAlpha second && isUpper second then
-            curHead : '_' : toLower second : (parseLineToC $ tail $ tail $ str)
-        else curHead : (parseLineToC $ tail str) 
+        if secondLetter == includeSymbol then str
+        else if (isTwoLettersCamelCase firstLetter secondLetter) then
+            firstLetter : underScoreSymbol : toLower secondLetter : (parseLineToC $ tail $ tail $ str)
+        else firstLetter : (parseLineToC $ tail str) 
     | otherwise = str    
-    where curHead = head str
-          second = 
+    where firstLetter = head str
+          secondLetter = 
             if length str > 1 then 
                 head $ tail $ str
-            else '#' -- just mark with dummy char to know that this is an empty list
+            else includeSymbol -- just mark with dummy char to know that this is an empty list
 
 isLineCanBeChangedToC :: String -> Bool                                
 isLineCanBeChangedToC str = 
     if str == [] then 
         False 
-    else (head str) /= '#'
+    else (head str) /= includeSymbol
 
 parse :: String -> String -> IO() 
 parse style filePath = do
-    if style == "toc" 
+    if style == parseToCStyle 
     then
         do
             handle <- openFile filePath ReadMode  
-            (tempName, tempHandle) <- openTempFile "." "temp"  
+            (tempName, tempHandle) <- (openTempFile "." "temp")  
             contents <- hGetContents handle  
             hPutStr tempHandle $ parseToC contents  
             hClose handle  
