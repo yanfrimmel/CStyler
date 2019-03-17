@@ -15,7 +15,7 @@ parseToCStyle = "toc"
 
 parseToC :: String -> String
 parseToC str =  unlines $ map parseLineToC strLines
-    where strLines = lines str   
+    where strLines = lines str  
 
 isTwoLettersCamelCase :: Char -> Char -> Bool
 isTwoLettersCamelCase firstLetter secondLetter = 
