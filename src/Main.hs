@@ -1,11 +1,19 @@
 module Main where
 
-import System.Environment 
-import Parser
+import           System.Environment
+import           Parser
 
-main :: IO()
+invalidNumberOfArgumentsErrorMessage :: String
+invalidNumberOfArgumentsErrorMessage =
+    "Invalid number of arguments! arguments format: <["
+        ++ parseToCArgumentName
+        ++ "]["
+        ++ parseFromCArgumentName
+        ++ "]> <file-path>"
+
+main :: IO ()
 main = do
     args <- getArgs
     case args of
-        [style, filePath] ->   parse style filePath
-        _                 ->   putStrLn "Invalid number of arguments! arguments format: <style-type{toc}> file-path"
+        [style, filePath] -> parse style filePath
+        _                 -> putStrLn invalidNumberOfArgumentsErrorMessage

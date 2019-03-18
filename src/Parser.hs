@@ -1,5 +1,7 @@
 module Parser
     ( parse
+    , parseToCArgumentName
+    , parseFromCArgumentName
     )
 where
 
