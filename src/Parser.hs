@@ -1,5 +1,7 @@
 module Parser
     ( parse
+    , parseToC
+    , parseFromC
     , parseToCArgumentName
     , parseFromCArgumentName
     )
