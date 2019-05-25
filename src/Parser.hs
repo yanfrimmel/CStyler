@@ -35,31 +35,45 @@ parseToC :: String -> String
 parseToC str = unlines $ map parseLineToC strLines where strLines = lines str
 -- TODO: implement - currently it has a duplicate body of parseToC
 parseFromC :: String -> String
-parseFromC str = unlines $ map parseLineToC strLines
+parseFromC str = unlines $ map parseLineFromC strLines
     where strLines = lines str
 
-isTwoLettersCamelCase :: Char -> Char -> Bool
-isTwoLettersCamelCase firstLetter secondLetter =
-    isLower firstLetter && isUpper secondLetter
 
-parseLineToC :: String -> String
-parseLineToC str
-    | isLineCanBeChangedToC str = if secondLetter == includeSymbol
+parseLineFromC :: String -> String
+parseLineFromC str
+    | isLineCanBeChanged str = if secondLetter == includeSymbol || thirdLetter == includeSymbol
         then str
-        else if isTwoLettersCamelCase firstLetter secondLetter
+        else if isUnderScoreBetweenTwoLowerLetters firstLetter secondLetter thirdLetter
             then
                 firstLetter
-                : underScoreSymbol
-                : toLower secondLetter
-                : parseLineToC (tail $ tail str)
-            else firstLetter : parseLineToC (tail str)
+                : toUpper thirdLetter
+                : parseLineFromC (tail $ tail $ tail str)
+            else firstLetter : parseLineFromC (tail str)
+    | otherwise = str
+    where
+    firstLetter  = head str
+    secondLetter = if length str > 1 then head $ tail str else includeSymbol -- just mark with dummy char to know that this is an empty list
+    thirdLetter  = if length str > 2 then head $ tail $ tail str else includeSymbol -- just mark with dummy char to know that this is an empty list
+
+        
+parseLineToC :: String -> String
+parseLineToC str
+    | isLineCanBeChanged str = if secondLetter == includeSymbol
+     then str
+     else if isTwoLettersCamelCase firstLetter secondLetter
+         then
+             firstLetter
+             : underScoreSymbol
+             : toLower secondLetter
+             : parseLineToC (tail $ tail str)
+         else firstLetter : parseLineToC (tail str)
     | otherwise = str
   where
     firstLetter  = head str
     secondLetter = if length str > 1 then head $ tail str else includeSymbol -- just mark with dummy char to know that this is an empty list
 
-isLineCanBeChangedToC :: String -> Bool
-isLineCanBeChangedToC str = not (null str) && head str /= includeSymbol
+isLineCanBeChanged :: String -> Bool
+isLineCanBeChanged str = not (null str) && head str /= includeSymbol
 
 parse :: String -> String -> IO ()
 parse style filePath = do
@@ -90,3 +104,11 @@ onFileParseFailure handle tempHandle tempFilePath = do
     hClose tempHandle
     removeFile tempFilePath
     putStrLn invalidArgumentsErrorMessage
+
+isTwoLettersCamelCase :: Char -> Char -> Bool
+isTwoLettersCamelCase firstLetter secondLetter =
+    isLower firstLetter && isUpper secondLetter
+
+isUnderScoreBetweenTwoLowerLetters :: Char -> Char -> Char -> Bool
+isUnderScoreBetweenTwoLowerLetters firstLetter secondLetter thirdLetter =
+    isLower firstLetter && underScoreSymbol == secondLetter && isLower thirdLetter    
