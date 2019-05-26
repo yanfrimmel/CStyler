@@ -13,13 +13,13 @@ C source code style formatter tool
 ### To C style code from OO style code
 
 ```bash
-    stack exec cstyler c $filepath
+    stack exec cstyler-exe c $filepath
 ```
 
 ### To OO style code from c style code
 
 ```bash
-    stack exec cstyler oo $filepath
+    stack exec cstyler-exe oo $filepath
 ```
 
 ## Features
