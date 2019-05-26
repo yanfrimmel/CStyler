@@ -1,12 +1,29 @@
 # CStyler
-C source code style formatter tool 
 
-### How to use:
+C source code style formatter tool
+
+## How to use
+
+### To build
+
 ```bash
     stack build
-    stack exec cstyler toc $filepath
 ```
-### Features:
+
+### To C style code from OO style code
+
+```bash
+    stack exec cstyler c $filepath
+```
+
+### To OO style code from c style code
+
+```bash
+    stack exec cstyler oo $filepath
+```
+
+## Features
+
 * Form OO style code (camel cases to separate) to c style code (under scores to separate words).
-* TODO: Form c style code (under scores to separate words) to OO style code (camel cases to separate).
-* TODO: Apply to entire directory of *.c files
+* Form c style code (under scores to separate words) to OO style code (camel cases to separate).
+* TODO: Apply to entire directory of *.c files and recusive within a directory.

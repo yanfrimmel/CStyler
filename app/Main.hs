@@ -8,7 +8,7 @@ invalidNumberOfArgumentsErrorMessage =
     "Invalid number of arguments! arguments format: <["
         ++ parseToCArgumentName
         ++ "]["
-        ++ parseFromCArgumentName
+        ++ parseToOOArgumentName
         ++ "]> <file-path>"
 
 main :: IO ()

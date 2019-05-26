@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 192850a6dd262d20a4b274f3fca04ad26874f1bd70fdc42e8f15262bd52bb8a9
+-- hash: a1b51d5df26597a6160672cd7aafd650a3be219f2452841e997c799da75079ab
 
 name:           CStyler
 version:        0.1.0.0
@@ -19,7 +19,6 @@ license-file:   LICENSE
 build-type:     Simple
 extra-source-files:
     README.md
-    ChangeLog.md
 
 source-repository head
   type: git

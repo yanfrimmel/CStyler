@@ -20,12 +20,12 @@ spec = do
         it "Simple two lines" $
             Parser.parseToC "camelCase Camelcase\n camelCase\n" `shouldBe` "camel_case Camelcase\n camel_case\n"    
     
-    describe "parseFromC" $ do
+    describe "parseToOO" $ do
         it "Simple one line" $
-            Parser.parseFromC "camel_case\n" `shouldBe` "camelCase\n"
+            Parser.parseToOO "camel_case\n" `shouldBe` "camelCase\n"
         it "One line with upper case after underscore" $
-            Parser.parseFromC "camel_Case\n" `shouldBe` "camel_Case\n"    
+            Parser.parseToOO "camel_Case\n" `shouldBe` "camel_Case\n"    
         it "Multiple in one line" $
-            Parser.parseFromC "camel_c_ase and_camel\n" `shouldBe` "camelC_ase andCamel\n"
+            Parser.parseToOO "camel_c_ase and_camel\n" `shouldBe` "camelC_ase andCamel\n"
         it "Multiple in one line with double underscore" $
-            Parser.parseFromC "camel_case and__Camel\n" `shouldBe` "camelCase and__Camel\n"    
+            Parser.parseToOO "camel_case and__Camel\n" `shouldBe` "camelCase and__Camel\n"    

@@ -8,7 +8,6 @@ license: MIT
 
 extra-source-files:
 - README.md
-- ChangeLog.md
 
 dependencies:
 - hspec

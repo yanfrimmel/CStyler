@@ -1,9 +1,9 @@
 module Parser
     ( parse
     , parseToC
-    , parseFromC
+    , parseToOO
     , parseToCArgumentName
-    , parseFromCArgumentName
+    , parseToOOArgumentName
     )
 where
 
@@ -18,29 +18,29 @@ underScoreSymbol :: Char
 underScoreSymbol = '_'
 
 parseToCArgumentName :: String
-parseToCArgumentName = "toc"
+parseToCArgumentName = "c"
 
-parseFromCArgumentName :: String
-parseFromCArgumentName = "fromc"
+parseToOOArgumentName :: String
+parseToOOArgumentName = "oo"
 
 invalidArgumentsErrorMessage :: String
 invalidArgumentsErrorMessage =
     "Invalid arguments! arguments format: <["
         ++ parseToCArgumentName
-        ++ "]["
-        ++ parseFromCArgumentName
+        ++ "]|["
+        ++ parseToOOArgumentName
         ++ "]> <file-path>"
 
 parseToC :: String -> String
 parseToC str = unlines $ map parseLineToC strLines where strLines = lines str
 
-parseFromC :: String -> String
-parseFromC str = unlines $ map parseLineFromC strLines
+parseToOO :: String -> String
+parseToOO str = unlines $ map parseLineToOO strLines
     where strLines = lines str
 
 
-parseLineFromC :: String -> String
-parseLineFromC str
+parseLineToOO :: String -> String
+parseLineToOO str
     | isLineCanBeChanged str
     = if secondLetter == includeSymbol || thirdLetter == includeSymbol
         then str
@@ -49,10 +49,10 @@ parseLineFromC str
                                                   secondLetter
                                                   thirdLetter
             then
-                firstLetter : toUpper thirdLetter : parseLineFromC
+                firstLetter : toUpper thirdLetter : parseLineToOO
                     (tail $ tail $ tail str)
             else
-                firstLetter : parseLineFromC (tail str)
+                firstLetter : parseLineToOO (tail str)
     | otherwise
     = str
   where
@@ -94,9 +94,9 @@ parse style filePath = do
         then do
             hPutStr tempHandle $ parseToC contents
             onFileParseSuccess handle tempHandle filePath tempFilePath
-        else if style == parseFromCArgumentName
+        else if style == parseToOOArgumentName
             then do
-                hPutStr tempHandle $ parseFromC contents
+                hPutStr tempHandle $ parseToOO contents
                 onFileParseSuccess handle tempHandle filePath tempFilePath
             else onFileParseFailure handle tempHandle tempFilePath
 
