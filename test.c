@@ -1,4 +1,4 @@
-#include "gameGame.h"
+#include "game.h"
 
 int initializeSdl(void) {
     // attempt to initialize graphics and timer system
