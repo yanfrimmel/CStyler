@@ -18,10 +18,10 @@ underScoreSymbol :: Char
 underScoreSymbol = '_'
 
 parseToCArgumentName :: String
-parseToCArgumentName = "c"
+parseToCArgumentName = "-c"
 
 parseToOOArgumentName :: String
-parseToOOArgumentName = "oo"
+parseToOOArgumentName = "-o"
 
 invalidArgumentsErrorMessage :: String
 invalidArgumentsErrorMessage =
@@ -39,20 +39,31 @@ parseToOO str = unlines $ map parseLineToOO strLines
     where strLines = lines str
 
 
+parseLineToOORememberLastLetter :: String -> Char -> String
+parseLineToOORememberLastLetter str lastLetter
+    | isLineCanBeChanged str
+    = if isToProcessScanedLettersToOO lastLetter secondLetter thirdLetter
+      then
+          toUpper thirdLetter
+              : parseLineToOORememberLastLetter (tail $ tail str) thirdLetter
+      else
+          parseLineToOO str
+    | otherwise
+    = str
+  where
+    secondLetter = head str
+    thirdLetter  = getCharFromParsingStringOrGetEscapeChar str 1
+
 parseLineToOO :: String -> String
 parseLineToOO str
     | isLineCanBeChanged str
-    = if secondLetter == includeSymbol || thirdLetter == includeSymbol
-        then str
-        else
-            if isUnderScoreBetweenTwoLowerLetters firstLetter
-                                                  secondLetter
-                                                  thirdLetter
-            then
-                firstLetter : toUpper thirdLetter : parseLineToOO
-                    (tail $ tail $ tail str)
-            else
-                firstLetter : parseLineToOO (tail str)
+    = if isToProcessScanedLettersToOO firstLetter secondLetter thirdLetter
+      then
+          firstLetter
+          : toUpper thirdLetter
+          : parseLineToOORememberLastLetter (tail $ tail $ tail str) thirdLetter
+      else
+          firstLetter : parseLineToOO (tail str)
     | otherwise
     = str
   where
@@ -62,16 +73,14 @@ parseLineToOO str
 
 parseLineToC :: String -> String
 parseLineToC str
-    | isLineCanBeChanged str = if secondLetter == includeSymbol
-        then str
-        else if isTwoLettersCamelCase firstLetter secondLetter
-            then
-                firstLetter
-                : underScoreSymbol
-                : toLower secondLetter
-                : parseLineToC (tail $ tail str)
-            else firstLetter : parseLineToC (tail str)
-    | otherwise = str
+    | isLineCanBeChanged str
+    = if isToProcessScanedLettersToC firstLetter secondLetter
+        then
+            firstLetter : underScoreSymbol : toLower secondLetter : parseLineToC
+                (tail $ tail str)
+        else firstLetter : parseLineToC (tail str)
+    | otherwise
+    = str
   where
     firstLetter  = head str
     secondLetter = getCharFromParsingStringOrGetEscapeChar str 1
@@ -84,6 +93,22 @@ getCharFromParsingStringOrGetEscapeChar str lessThanMinimumSize =
 
 isLineCanBeChanged :: String -> Bool
 isLineCanBeChanged str = not (null str) && head str /= includeSymbol
+
+isToProcessScanedLettersToC :: Char -> Char -> Bool
+isToProcessScanedLettersToC firstLetter secondLetter =
+    secondLetter
+        /= includeSymbol
+        && isTwoLettersCamelCase firstLetter secondLetter
+
+isToProcessScanedLettersToOO :: Char -> Char -> Char -> Bool
+isToProcessScanedLettersToOO firstLetter secondLetter thirdLetter =
+    secondLetter
+        /= includeSymbol
+        && thirdLetter
+        /= includeSymbol
+        && isTreeLetterShouldChangeToOOStyle firstLetter
+                                             secondLetter
+                                             thirdLetter
 
 parse :: String -> String -> IO ()
 parse style filePath = do
@@ -119,8 +144,8 @@ isTwoLettersCamelCase :: Char -> Char -> Bool
 isTwoLettersCamelCase firstLetter secondLetter =
     isLower firstLetter && isUpper secondLetter
 
-isUnderScoreBetweenTwoLowerLetters :: Char -> Char -> Char -> Bool
-isUnderScoreBetweenTwoLowerLetters firstLetter secondLetter thirdLetter =
+isTreeLetterShouldChangeToOOStyle :: Char -> Char -> Char -> Bool
+isTreeLetterShouldChangeToOOStyle firstLetter secondLetter thirdLetter =
     isLower firstLetter
         && underScoreSymbol
         == secondLetter

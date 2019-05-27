@@ -4,10 +4,10 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: b892f5dae41bef1c6e650d0bbf308bc6a42a0332814453f48ac7d1eb98f6d247
+-- hash: 3dd1e00f8afac18d332ddf68d341788045161e4d6a0dbc924433baa6c18fd75c
 
 name:           CStyler
-version:        0.2.0.0
+version:        0.4.0.0
 description:    Please see the README on GitHub at <https://github.com/yanfrimmel/CStyler#readme>
 homepage:       https://github.com/yanfrimmel/CStyler#readme
 bug-reports:    https://github.com/yanfrimmel/CStyler/issues

@@ -23,9 +23,11 @@ spec = do
     describe "parseToOO" $ do
         it "Simple one line" $
             Parser.parseToOO "camel_case\n" `shouldBe` "camelCase\n"
+        it "Multiple in a sequence one line" $
+            Parser.parseToOO "camel_c_a_se\n" `shouldBe` "camelCASe\n"
         it "One line with upper case after underscore" $
             Parser.parseToOO "camel_Case\n" `shouldBe` "camel_Case\n"    
         it "Multiple in one line" $
-            Parser.parseToOO "camel_c_ase and_camel\n" `shouldBe` "camelC_ase andCamel\n"
+            Parser.parseToOO "camel_c_ase and_camel\n" `shouldBe` "camelCAse andCamel\n"
         it "Multiple in one line with double underscore" $
             Parser.parseToOO "camel_case and__Camel\n" `shouldBe` "camelCase and__Camel\n"    
