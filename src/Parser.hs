@@ -1,15 +1,21 @@
 module Parser
-    ( parse
+    ( start
+    , parse
     , parseToC
     , parseToOO
     , parseToCArgumentName
     , parseToOOArgumentName
+    , isRecursiveArgumentName
     )
 where
 
 import           System.IO
 import           System.Directory
+import           System.FilePath
+import           System.Posix.Files
 import           Data.Char
+import           Control.Monad
+
 
 includeSymbol :: Char
 includeSymbol = '#'
@@ -22,6 +28,9 @@ parseToCArgumentName = "-c"
 
 parseToOOArgumentName :: String
 parseToOOArgumentName = "-o"
+
+isRecursiveArgumentName :: String
+isRecursiveArgumentName = "-r"
 
 invalidArgumentsErrorMessage :: String
 invalidArgumentsErrorMessage =
@@ -43,11 +52,10 @@ parseLineToOORememberLastLetter :: String -> Char -> String
 parseLineToOORememberLastLetter str lastLetter
     | isLineCanBeChanged str
     = if isToProcessScanedLettersToOO lastLetter secondLetter thirdLetter
-      then
-          toUpper thirdLetter
-              : parseLineToOORememberLastLetter (tail $ tail str) thirdLetter
-      else
-          parseLineToOO str
+        then
+            toUpper thirdLetter
+                : parseLineToOORememberLastLetter (tail $ tail str) thirdLetter
+        else parseLineToOO str
     | otherwise
     = str
   where
@@ -58,12 +66,12 @@ parseLineToOO :: String -> String
 parseLineToOO str
     | isLineCanBeChanged str
     = if isToProcessScanedLettersToOO firstLetter secondLetter thirdLetter
-      then
-          firstLetter
-          : toUpper thirdLetter
-          : parseLineToOORememberLastLetter (tail $ tail $ tail str) thirdLetter
-      else
-          firstLetter : parseLineToOO (tail str)
+        then
+            firstLetter
+            : toUpper thirdLetter
+            : parseLineToOORememberLastLetter (tail $ tail $ tail str)
+                                              thirdLetter
+        else firstLetter : parseLineToOO (tail str)
     | otherwise
     = str
   where
@@ -109,6 +117,26 @@ isToProcessScanedLettersToOO firstLetter secondLetter thirdLetter =
         && isTreeLetterShouldChangeToOOStyle firstLetter
                                              secondLetter
                                              thirdLetter
+
+start :: String -> String -> String -> IO ()
+start style isRecursive filePath
+    | isRecursive == isRecursiveArgumentName = do
+        filePaths <- recursivelyGetFilePaths filePath
+        mapM_ (\file -> parse style file) filePaths
+    | otherwise = parse style filePath
+
+
+recursivelyGetFilePaths :: FilePath -> IO [FilePath]
+recursivelyGetFilePaths top = do
+    directoryContents <- getDirectoryContents top
+    paths             <- forM directoryContents $ \subDir -> do
+        let path = top </> subDir
+        fileStatus <- getFileStatus path
+        if isDirectory fileStatus
+            then recursivelyGetFilePaths path
+            else return [path]
+    return (concat paths)
+
 
 parse :: String -> String -> IO ()
 parse style filePath = do

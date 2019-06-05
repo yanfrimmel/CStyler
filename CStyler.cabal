@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 3dd1e00f8afac18d332ddf68d341788045161e4d6a0dbc924433baa6c18fd75c
+-- hash: 4727dde5c976600ed0bbbae6c2ec7dbee1d7f9637f5afe712be2b29974983ced
 
 name:           CStyler
 version:        0.4.0.0
@@ -34,7 +34,9 @@ library
   build-depends:
       base >=4.7 && <5
     , directory
+    , filepath
     , hspec
+    , unix
   default-language: Haskell2010
 
 executable cstyler-exe
@@ -48,7 +50,9 @@ executable cstyler-exe
       CStyler
     , base >=4.7 && <5
     , directory
+    , filepath
     , hspec
+    , unix
   default-language: Haskell2010
 
 test-suite cstyler-test
@@ -63,5 +67,7 @@ test-suite cstyler-test
       CStyler
     , base >=4.7 && <5
     , directory
+    , filepath
     , hspec
+    , unix
   default-language: Haskell2010

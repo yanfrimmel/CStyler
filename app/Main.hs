@@ -7,13 +7,16 @@ invalidNumberOfArgumentsErrorMessage :: String
 invalidNumberOfArgumentsErrorMessage =
     "Invalid number of arguments! arguments format: <["
         ++ parseToCArgumentName
-        ++ "]["
+        ++ "]/["
         ++ parseToOOArgumentName
-        ++ "]> <file-path>"
+        ++ "]> <["
+        ++ isRecursiveArgumentName
+        ++ "]> <path>"
 
 main :: IO ()
 main = do
     args <- getArgs
     case args of
-        [style, filePath] -> parse style filePath
-        _                 -> putStrLn invalidNumberOfArgumentsErrorMessage
+        [style, recursive, path] -> start style recursive path
+        [style, path] -> start style "" path
+        _ -> putStrLn invalidNumberOfArgumentsErrorMessage
