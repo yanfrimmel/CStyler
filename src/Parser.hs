@@ -128,7 +128,7 @@ start style isRecursive filePath
 
 recursivelyGetFilePaths :: FilePath -> IO [FilePath]
 recursivelyGetFilePaths top = do
-    directoryContents <- getDirectoryContents top
+    directoryContents <- listDirectory top
     paths             <- forM directoryContents $ \subDir -> do
         let path = top </> subDir
         fileStatus <- getFileStatus path
@@ -140,6 +140,7 @@ recursivelyGetFilePaths top = do
 
 parse :: String -> String -> IO ()
 parse style filePath = do
+    print $ "processing: " ++ filePath ++ " ..." 
     handle                     <- openFile filePath ReadMode
     (tempFilePath, tempHandle) <- openTempFile "." "temp"
     contents                   <- hGetContents handle
