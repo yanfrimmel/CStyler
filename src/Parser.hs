@@ -15,7 +15,7 @@ import           System.FilePath
 import           System.Posix.Files
 import           Data.Char
 import           Control.Monad
-
+import           Control.Concurrent.Async
 
 includeSymbol :: Char
 includeSymbol = '#'
@@ -122,7 +122,7 @@ start :: String -> String -> String -> IO ()
 start style isRecursive filePath
     | isRecursive == isRecursiveArgumentName = do
         filePaths <- recursivelyGetFilePaths filePath
-        mapM_ (\file -> parse style file) filePaths
+        mapConcurrently_ (\file -> parse style file) filePaths
     | otherwise = parse style filePath
 
 
@@ -140,7 +140,7 @@ recursivelyGetFilePaths top = do
 
 parse :: String -> String -> IO ()
 parse style filePath = do
-    print $ "processing: " ++ filePath ++ " ..." 
+    print $ "processing: " ++ filePath ++ " ..."
     handle                     <- openFile filePath ReadMode
     (tempFilePath, tempHandle) <- openTempFile "." "temp"
     contents                   <- hGetContents handle

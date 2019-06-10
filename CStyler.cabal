@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 4727dde5c976600ed0bbbae6c2ec7dbee1d7f9637f5afe712be2b29974983ced
+-- hash: 75fc936cbce3ef0978240de96e6d9563f51cc791c6f8840107b24e0f113adcd7
 
 name:           CStyler
 version:        0.4.0.0
@@ -32,7 +32,8 @@ library
   hs-source-dirs:
       src
   build-depends:
-      base >=4.7 && <5
+      async
+    , base >=4.7 && <5
     , directory
     , filepath
     , hspec
@@ -48,6 +49,7 @@ executable cstyler-exe
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       CStyler
+    , async
     , base >=4.7 && <5
     , directory
     , filepath
@@ -65,6 +67,7 @@ test-suite cstyler-test
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       CStyler
+    , async
     , base >=4.7 && <5
     , directory
     , filepath
