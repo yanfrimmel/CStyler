@@ -9,14 +9,11 @@ invalidNumberOfArgumentsErrorMessage =
         ++ parseToCArgumentName
         ++ "]/["
         ++ parseToOOArgumentName
-        ++ "]> <["
-        ++ isRecursiveArgumentName
         ++ "]> <path>"
 
 main :: IO ()
 main = do
     args <- getArgs
     case args of
-        [style, recursive, path] -> start style recursive path
-        [style, path] -> start style "" path
+        [style, path] -> start style path
         _ -> putStrLn invalidNumberOfArgumentsErrorMessage

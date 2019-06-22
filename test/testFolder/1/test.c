@@ -1,5 +1,5 @@
 #include "game.h"
 
-int initializeSdl(void) {
+int initialize_sdl(void) {
 }
 

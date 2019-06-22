@@ -5,14 +5,12 @@ module Parser
     , parseToOO
     , parseToCArgumentName
     , parseToOOArgumentName
-    , isRecursiveArgumentName
     )
 where
 
 import           System.IO
 import           System.Directory
 import           System.FilePath
-import           System.Posix.Files
 import           Data.Char
 import           Control.Monad
 import           Control.Concurrent.Async
@@ -28,9 +26,6 @@ parseToCArgumentName = "-c"
 
 parseToOOArgumentName :: String
 parseToOOArgumentName = "-o"
-
-isRecursiveArgumentName :: String
-isRecursiveArgumentName = "-r"
 
 invalidArgumentsErrorMessage :: String
 invalidArgumentsErrorMessage =
@@ -118,12 +113,14 @@ isToProcessScanedLettersToOO firstLetter secondLetter thirdLetter =
                                              secondLetter
                                              thirdLetter
 
-start :: String -> String -> String -> IO ()
-start style isRecursive filePath
-    | isRecursive == isRecursiveArgumentName = do
-        filePaths <- recursivelyGetFilePaths filePath
-        mapConcurrently_ (\file -> parse style file) filePaths
-    | otherwise = parse style filePath
+start :: String -> String -> IO ()
+start style filePath = do
+    isDirectory <- doesDirectoryExist filePath
+    if isDirectory
+        then do
+            filePaths <- recursivelyGetFilePaths filePath
+            mapConcurrently_ (\file -> parse style file) filePaths
+        else parse style filePath
 
 
 recursivelyGetFilePaths :: FilePath -> IO [FilePath]
@@ -131,19 +128,17 @@ recursivelyGetFilePaths top = do
     directoryContents <- listDirectory top
     paths             <- forM directoryContents $ \subDir -> do
         let path = top </> subDir
-        fileStatus <- getFileStatus path
-        if isDirectory fileStatus
-            then recursivelyGetFilePaths path
-            else return [path]
+        isDirectory <- doesDirectoryExist path
+        if isDirectory then recursivelyGetFilePaths path else return [path]
     return (concat paths)
 
 
 parse :: String -> String -> IO ()
 parse style filePath = do
-    print $ "processing: " ++ filePath ++ " ..."
     handle                     <- openFile filePath ReadMode
     (tempFilePath, tempHandle) <- openTempFile "." "temp"
     contents                   <- hGetContents handle
+    print $ "processing: " ++ filePath ++ " ..."
     if style == parseToCArgumentName
         then do
             hPutStr tempHandle $ parseToC contents
