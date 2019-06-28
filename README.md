@@ -16,6 +16,12 @@ C source code style formatter tool
     stack build
 ```
 
+### To test
+
+```bash
+    stack test
+```
+
 ### To C style code from OO style code
 
 ```bash
@@ -27,3 +33,5 @@ C source code style formatter tool
 ```bash
     stack exec cstyler-exe -- -o $path
 ```
+
+* $path could be directory or file.
