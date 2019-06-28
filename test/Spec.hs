@@ -2,15 +2,21 @@ import           Test.Hspec
 import           Parser
 import           System.IO.Error                ( isDoesNotExistError )
 import           System.IO
+import           System.IO.Unsafe
 import           System.Directory
 import           System.FilePath
+import           Data.List
 
 main :: IO ()
 main = hspec spec
 
--- cTestFileConent :: IO Bool
--- cTestFileConent = 
---     (readFile "test/testFolder/test.c") == return "#include \"game.h\n\n\"int initializeSdl(void) {\n}"
+testDirtyFileContentsAfterParse :: String -> FilePath -> String -> IO Bool
+testDirtyFileContentsAfterParse mode fileName contentsToCompare = do
+    Parser.start mode fileName
+    print $ "testDirtyFileContentsAfterParse: file content: " ++ unsafePerformIO (readFile fileName)
+    return $ (unsafePerformIO $ readFile fileName) == contentsToCompare
+
+
 
 spec :: Spec
 spec = do
@@ -18,10 +24,20 @@ spec = do
         it "No such directory"
             $             Parser.start "-c" "test/testFolder1"
             `shouldThrow` isDoesNotExistError
-        -- it "Parse on file to OO style"
-        --     $             Parser.start "-c" "test/testFolder/test.c"
-        --     `shouldSatisfy` readFile "test/testFolder/test.c" == return "#include \"game.h\n\n\"int initializeSdl(void) {\n}"  
-
+        it "Parse on file to OO style (Unsafe test)"
+            $          (unsafePerformIO $ testDirtyFileContentsAfterParse
+                           "-o"
+                           "test/testFolder/test.c"
+                           "#include \"game.h\"\n\nint initializeSdl(void) {\n}\n"
+                       )
+            `shouldBe` True
+        it "Parse on file to c style (Unsafe test)"
+            $          (unsafePerformIO $ testDirtyFileContentsAfterParse
+                           "-c"
+                           "test/testFolder/test.c"
+                           "#include \"game.h\"\n\nint initialize_sdl(void) {\n}\n"
+                       )
+            `shouldBe` True    
     describe "parseToC" $ do
         it "Simple one line"
             $          Parser.parseToC "camelCase\n"

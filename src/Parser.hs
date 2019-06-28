@@ -123,6 +123,12 @@ start style filePath = do
         else parse style filePath
 
 
+-- start' :: Monad m => (FilePath -> IO Bool) -> (FilePath -> IO [FilePath]) -> String -> String -> m ()
+-- start' doesDirectoryExist recursivelyGetFilePaths style filePath = do
+--     contents <- f filePath
+--     return (length contents)        
+
+
 recursivelyGetFilePaths :: FilePath -> IO [FilePath]
 recursivelyGetFilePaths top = do
     directoryContents <- listDirectory top
